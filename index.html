@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>College Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            padding: 15px;
+            border: 2px solid #ffe0b3;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffd32a;
+            box-shadow: 0 0 0 3px rgba(255, 211, 42, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff5722, #e64a19);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(230, 74, 25, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        #results {
+            margin-top: 40px;
+            padding: 30px;
+            background: #fff8e1;
+            border-radius: 15px;
+            border-left: 5px solid #ffd32a;
+        }
+
+        .results-header {
+            background: linear-gradient(45deg, #ffecb3 0%, #ffd54f 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .results-header h3 {
+            color: #e65100;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ffe0b3;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #bf360c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e65100;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        th {
+            background: linear-gradient(45deg, #ff8f00, #d84315);
+            color: white;
+            padding: 18px 15px;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ffe0b3;
+            transition: background-color 0.3s ease;
+        }
+
+        tr:hover td {
+            background-color: #fff8e1;
+        }
+
+        .status-safe {
+            color: #2e7d32;
+            font-weight: 700;
+            background: rgba(46, 125, 50, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status-risky {
+            color: #f57c00;
+            font-weight: 700;
+            background: rgba(245, 124, 0, 0.1);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(45deg, #ffcdd2 0%, #ff8a80 100%);
+            border-radius: 15px;
+            color: #c62828;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .note {
+            background: linear-gradient(45deg, #fff3e0 0%, #ffcc02 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border: 1px solid #ffb74d;
+        }
+
+        .note strong {
+            color: #e65100;
+            font-size: 1.1rem;
+        }
+
+        .note p {
+            margin: 10px 0;
+            color: #bf360c;
+            line-height: 1.6;
+        }
+
+        .college-count {
+            background: linear-gradient(45deg, #ffd32a, #ff8f00);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer {
+            background: linear-gradient(45deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #fff8e1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer p {
+            margin: 8px 0;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .footer .company-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff8e1;
+            margin: 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer .copyright {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 211, 42, 0.3);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .footer .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .footer .contact-item {
+            background: rgba(255, 211, 42, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .footer .contact-item h5 {
+            color: #ffd32a;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h2 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+
+            .footer {
+                padding: 20px;
+            }
+
+            .footer .contact-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 211, 42, 0.3);
+            border-top: 4px solid #ffd32a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🎓 College Predictor Tool</h2>
+            <p>MHT-CET & JEE College Admission Predictor</p>
+        </div>
+
+        <div class="form-container">
+            <form id="predictorForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="studentName">👤 Student Name:</label>
+                        <input type="text" id="studentName" required placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="examType">📝 Exam Type:</label>
+                        <select id="examType">
+                            <option value="CET">MHT-CET</option>
+                            <option value="JEE">JEE</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="branch">🔧 Branch:</label>
+                        <select id="branch">
+                            <option value="COMPUTERS">Computer Engineering</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="AIDS">AIDS</option>
+                            <option value="AIML">AIML</option>
+                            <option value="EXTC">EXTC</option>
+                            <option value="ECS">ECS</option>
+                            <option value="MECH">Mechanical</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="percentile">📊 Percentile:</label>
+                        <input type="number" step="0.01" id="percentile" required placeholder="e.g., 95.5">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rank">🏆 Rank:</label>
+                        <input type="number" id="rank" required placeholder="e.g., 5000">
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">🔍 Predict My Colleges</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing your data and finding the best colleges...</p>
+            </div>
+        </div>
+
+        <div id="results"></div>
+    </div>
+    <br><br>
+<!-- Footer HTML -->
+    <div class="footer">
+        <div class="footer-content">
+            <h4>The quality goes in before the name goes on...</h4>
+            <div class="company-name">Get Tutorials</div>
+            <p>Empowering students with data-driven college admission predictions</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <h5>📧 Email</h5>
+                    <p>info@getanalytix.com</p>
+                </div>
+                <div class="contact-item">
+                    <h5>📱 Phone</h5>
+                    <p>+91 76200 25240</p>
+                </div>
+                <div class="contact-item">
+                  <a style="text-decoration: none;" href="https://www.gettutorials.in/">  <h5>🌐 Click here</h5> <p style="color: white;">Website</p> </a>
+                
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 Get Tutorials. All rights reserved.</p>
+                <p>Designed with ❤️ from engineers for aspiring engineers</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const collegeData = [
+            {
+                name: "VJTI,Matunga",
+                branches: {
+                    COMPUTERS: { CET: { Open: 99.9619, JEE_M: null }, JEE: { Open: 99.9194, JEE_M: null } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: 99.6860, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: 99.1347, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "SPIT/SPCE,Andheri",
+                branches: {
+                    COMPUTERS: { CET: { Open: 99.7799, JEE_M: 98.3501 }, JEE: { Open: null, JEE_M: null } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 99.3101, JEE_M: 97.602 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 98.6114, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "DJ Sanghvi,Vile Parle",
+                branches: {
+                    COMPUTERS: { CET: { Open: 99.4417, JEE_M: 97.8343 }, JEE: { Open: 99.0427, JEE_M: 97.3251 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 98.8315, JEE_M: 97.0962 } },
+                    AIDS: { CET: { Open: 98.7008, JEE_M: 96.8646 }, JEE: { Open: 98.117, JEE_M: 95.8358 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 96.7545, JEE_M: 94.8542 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Thadomal,Bandra",
+                branches: {
+                    COMPUTERS: { CET: { Open: 98.6854, JEE_M: 97.115 }, JEE: { Open: 98.5704, JEE_M: 96.7045 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 96.4469, JEE_M: 96.5165 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 97.854, JEE_M: 95.3214 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Vivekanand,Chembur",
+                branches: {
+                    COMPUTERS: { CET: { Open: 98.117, JEE_M: 95.817 }, JEE: { Open: 97.6386, JEE_M: 94.9895 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 97.402, JEE_M: 94.0977 } },
+                    AIDS: { CET: { Open: 96.0961, JEE_M: 93.2949 }, JEE: { Open: 96.8881, JEE_M: 93.9366 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "KJ Somaiya,Sion",
+                branches: {
+                    COMPUTERS: { CET: { Open: 97.497, JEE_M: 95.168 }, JEE: { Open: 96.840, JEE_M: 94.2795 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 96.4124, JEE_M: 93.9802 } },
+                    AIDS: { CET: { Open: 94.6003, JEE_M: 92.903 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Father C Rodrigues (Fr Agnel),Bandra",
+                branches: {
+                    COMPUTERS: { CET: { Open: 97.6648, JEE_M: 94.2388 }, JEE: { Open: null, JEE_M: null } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 93.6711, JEE_M: 87.4759 }, JEE: { Open: 86.261, JEE_M: 93.024 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 92.5934, JEE_M: 89.8588 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Vidyalankar,Wadala",
+                branches: {
+                    COMPUTERS: { CET: { Open: 97.1791, JEE_M: 92.9802 }, JEE: { Open: 96.2109, JEE_M: 87.4759 } },
+                    IT: { CET: { Open: 93.3794, JEE_M: 87.4759 }, JEE: { Open: 94.5631, JEE_M: 89.1 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 16856, JEE_M: 8399 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 90.277, JEE_M: 88.0271 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Thakur,Kandivli",
+                branches: {
+                    COMPUTERS: { CET: { Open: 96.9076, JEE_M: 95.9802 }, JEE: { Open: 96.003, JEE_M: 20 } },
+                    IT: { CET: { Open: 64, JEE_M: 92.4373 }, JEE: { Open: 95, JEE_M: 92.2148 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 36358, JEE_M: 19677 }, JEE: { Open: 87.5598, JEE_M: 80.8231 } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Don Bosco,Borivali",
+                branches: {
+                    COMPUTERS: { CET: { Open: 12561, JEE_M: 7073 }, JEE: { Open: 14634, JEE_M: 8815 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 29961, JEE_M: 15501 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 63041, JEE_M: 30113 }, JEE: { Open: 77.84, JEE_M: 70.8363 } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "St Francis,Borivali",
+                branches: {
+                    COMPUTERS: { CET: { Open: 12595, JEE_M: 7842 }, JEE: { Open: 15536, JEE_M: 9075 } },
+                    IT: { CET: { Open: 17812, JEE_M: 10564 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 32249, JEE_M: 12985 }, JEE: { Open: 46502, JEE_M: 27325 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 84.0259, JEE_M: 72.7256 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Rajiv Gandhi,Versova Andheri",
+                branches: {
+                    COMPUTERS: { CET: { Open: 14631, JEE_M: 11176 }, JEE: { Open: 20138, JEE_M: 13594 } },
+                    IT: { CET: { Open: 18983, JEE_M: 12670 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 37890, JEE_M: 17325 }, JEE: { Open: 87.0844, JEE_M: 73.8736 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Xavier's,Mahim",
+                branches: {
+                    COMPUTERS: { CET: { Open: 15749, JEE_M: 7918 }, JEE: { Open: 17538, JEE_M: 9672 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 68535, JEE_M: 87.276 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "SIES,Nerul",
+                branches: {
+                    COMPUTERS: { CET: { Open: 92.3015, JEE_M: 91.2878 }, JEE: { Open: 94.7536, JEE_M: 89.7775 } },
+                    IT: { CET: { Open: 93.3341, JEE_M: 89.0826 }, JEE: { Open: 93.2547, JEE_M: 88.2054 } },
+                    AIDS: { CET: { Open: 88.7353, JEE_M: 84.3167 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Thakur,Kandivli Narayan",
+                branches: {
+                    COMPUTERS: { CET: { Open: 18072, JEE_M: 9863 }, JEE: { Open: 26508, JEE_M: 13199 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 23966, JEE_M: 10579 } },
+                    AIDS: { CET: { Open: 92.0088, JEE_M: 89.052 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 57952, JEE_M: 27704 }, JEE: { Open: 79.824, JEE_M: 73.7173 } },
+                    ECS: { CET: { Open: 96653, JEE_M: 53647 }, JEE: { Open: 63.234, JEE_M: 51.7541 } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Bharati Vidyapeeth Kharghar",
+                branches: {
+                    COMPUTERS: { CET: { Open: 18732, JEE_M: 11970 }, JEE: { Open: 22639, JEE_M: 12710 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 49940, JEE_M: 26791 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: 82.7776, JEE_M: 74.4848 }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Bhaghubhai,Vileparle",
+                branches: {
+                    COMPUTERS: { CET: { Open: 16913, JEE_M: 9850 }, JEE: { Open: 33117, JEE_M: 18066 } },
+                    IT: { CET: { Open: 34222, JEE_M: 17640 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 88.5013, JEE_M: 82.6084 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 47090, JEE_M: 27700 }, JEE: { Open: 30714, JEE_M: 18609 } },
+                    ECS: { CET: { Open: 83.7447, JEE_M: 73.7173 }, JEE: { Open: 89.6809, JEE_M: 81.7745 } },
+                    MECH: { CET: { Open: 40441, JEE_M: 20313 }, JEE: { Open: 35260, JEE_M: 18956 } }
+                }
+            },
+            {
+                name: "Atharva,Malad",
+                branches: {
+                    COMPUTERS: { CET: { Open: 19320, JEE_M: 10016 }, JEE: { Open: 24621, JEE_M: 14255 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 86.1433, JEE_M: 80.2781 }, JEE: { Open: 88.0535, JEE_M: 31.4533 } },
+                    ECS: { CET: { Open: 46600, JEE_M: 19051 }, JEE: { Open: 53.727, JEE_M: 18098 } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Shah & Anchor,Chembur",
+                branches: {
+                    COMPUTERS: { CET: { Open: 27283, JEE_M: 11225 }, JEE: { Open: 25393, JEE_M: 14253 } },
+                    IT: { CET: { Open: 25110, JEE_M: 14466 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 91.6275, JEE_M: 85.5369 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 83.9659, JEE_M: 80.5394 }, JEE: { Open: 89.2835, JEE_M: 83.5374 } },
+                    ECS: { CET: { Open: 73.7743, JEE_M: 67.5334 }, JEE: { Open: 91799, JEE_M: 53514 } },
+                    MECH: { CET: { Open: 96550, JEE_M: 51468 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Pillai,New Panvel",
+                branches: {
+                    COMPUTERS: { CET: { Open: 27283, JEE_M: 11225 }, JEE: { Open: 25393, JEE_M: 14253 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 73.553, JEE_M: 34816 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Tema,Neru",
+                branches: {
+                    COMPUTERS: { CET: { Open: 22115, JEE_M: 17010 }, JEE: { Open: 25258, JEE_M: 17963 } },
+                    IT: { CET: { Open: 28432, JEE_M: 18375 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 81.1968, JEE_M: 68.2294 }, JEE: { Open: 54657, JEE_M: 34029 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Vidyavardhini (Vasai)",
+                branches: {
+                    COMPUTERS: { CET: { Open: 92.5368, JEE_M: 82.7686 }, JEE: { Open: 91.634, JEE_M: 82.0169 } },
+                    IT: { CET: { Open: 26984, JEE_M: 19620 }, JEE: { Open: 50756, JEE_M: 27843 } },
+                    AIDS: { CET: { Open: 90.1279, JEE_M: 80.1034 }, JEE: { Open: 82.554, JEE_M: 73.6143 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 81940, JEE_M: 45604 } },
+                    EXTC: { CET: { Open: 70.2544, JEE_M: 56.1661 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Datta Meghe,Airol",
+                branches: {
+                    COMPUTERS: { CET: { Open: 34799, JEE_M: 17388 }, JEE: { Open: 28726, JEE_M: 22122 } },
+                    IT: { CET: { Open: 32679, JEE_M: 23418 }, JEE: { Open: 53055, JEE_M: 34781 } },
+                    AIDS: { CET: { Open: 88.1575, JEE_M: 82.8234 }, JEE: { Open: 81.7098, JEE_M: 67.602 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 81189, JEE_M: 52999 } },
+                    EXTC: { CET: { Open: 70.5008, JEE_M: 52.3748 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Vasantdada,Sion",
+                branches: {
+                    COMPUTERS: { CET: { Open: 23187, JEE_M: 19260 }, JEE: { Open: 29837, JEE_M: 22778 } },
+                    IT: { CET: { Open: 31550, JEE_M: 21952 }, JEE: { Open: 89.3223, JEE_M: 78.7132 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 40497, JEE_M: 27866 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 86.1143, JEE_M: 73.6143 } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Rizvi,Bandra",
+                branches: {
+                    COMPUTERS: { CET: { Open: 29964, JEE_M: 12975 }, JEE: { Open: null, JEE_M: null } },
+                    IT: { CET: { Open: 32504, JEE_M: 14042 }, JEE: { Open: 38226, JEE_M: 21096 } },
+                    AIDS: { CET: { Open: 89.0376, JEE_M: 85.9209 }, JEE: { Open: 86.8966, JEE_M: 79.5722 } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 89601, JEE_M: 45927 }, JEE: { Open: 66.4751, JEE_M: 58.5204 } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "AP Shah,Ghodbunde Road Thane",
+                branches: {
+                    COMPUTERS: { CET: { Open: 27499, JEE_M: 17243 }, JEE: { Open: 34683, JEE_M: 20591 } },
+                    IT: { CET: { Open: 36512, JEE_M: 18119 }, JEE: { Open: 87.5123, JEE_M: 82.9568 } },
+                    AIDS: { CET: { Open: 43268, JEE_M: 19321 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 83203, JEE_M: 34916 } },
+                    EXTC: { CET: { Open: 69.7094, JEE_M: 67.4708 }, JEE: { Open: 108232, JEE_M: 37009 } },
+                    ECS: { CET: { Open: 57.2537, JEE_M: 65.7022 }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: 108127, JEE_M: 38630 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Sahoe Shishik,Byculla",
+                branches: {
+                    COMPUTERS: { CET: { Open: 33697, JEE_M: 14479 }, JEE: { Open: 43083, JEE_M: 21604 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 85.2662, JEE_M: 79.0449 } },
+                    AIDS: { CET: { Open: 85.2572, JEE_M: 81.1206 }, JEE: { Open: 68341, JEE_M: 30280 } },
+                    AIML: { CET: { Open: 75.7359, JEE_M: 71.435 }, JEE: { Open: 82491, JEE_M: 31776 } },
+                    EXTC: { CET: { Open: 77.9466, JEE_M: 70.2243 }, JEE: { Open: 51381, JEE_M: 25863 } },
+                    ECS: { CET: { Open: 68218, JEE_M: 37746 }, JEE: { Open: 32.1678, JEE_M: 75.2255 } },
+                    MECH: { CET: { Open: 57.1959, JEE_M: 64.3372 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "LR Tiwari,Miraroad",
+                branches: {
+                    COMPUTERS: { CET: { Open: 36422, JEE_M: 50406 }, JEE: { Open: 4522, JEE_M: 24547 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 75.8854, JEE_M: 65.056 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: 78904, JEE_M: 47076 }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: 132983, JEE_M: 77671 } }
+                }
+            },
+            {
+                name: "K C College,Thane",
+                branches: {
+                    COMPUTERS: { CET: { Open: 41153, JEE_M: 26448 }, JEE: { Open: 54102, JEE_M: 30303 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 81.2928, JEE_M: 71.3604 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 54212, JEE_M: 33797 } },
+                    AIML: { CET: { Open: 51034, JEE_M: 35346 }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 82.4585, JEE_M: 67.1114 }, JEE: { Open: 71.4038, JEE_M: 57.5186 } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: 42.8773, JEE_M: 27.2706 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Jondhale,Dombivli",
+                branches: {
+                    COMPUTERS: { CET: { Open: 52009, JEE_M: 32954 }, JEE: { Open: 54212, JEE_M: 33797 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 81.2928, JEE_M: 71.3604 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Pravin Patil,Bhayandar",
+                branches: {
+                    COMPUTERS: { CET: { Open: 53706, JEE_M: 34424 }, JEE: { Open: 63909, JEE_M: 25082 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 77.825, JEE_M: 63.2235 } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 59327, JEE_M: 29827 } },
+                    AIML: { CET: { Open: 74667, JEE_M: 29250 }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 73.3652, JEE_M: 72.3618 }, JEE: { Open: 96748, JEE_M: 36962 } },
+                    ECS: { CET: { Open: 70577, JEE_M: 38879 }, JEE: { Open: 63.234, JEE_M: 65.7022 } },
+                    MECH: { CET: { Open: 57.9919, JEE_M: 47.4238 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "St.John,Palghar",
+                branches: {
+                    COMPUTERS: { CET: { Open: 54421, JEE_M: 25582 }, JEE: { Open: 71.6716, JEE_M: 36750 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 79.3458, JEE_M: 71.6716 } },
+                    AIDS: { CET: { Open: 74.9709, JEE_M: 64.2435 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: 116958, JEE_M: 67782 }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: 52.8148, JEE_M: 38.9966 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 172240, JEE_M: 62003 } },
+                    MECH: { CET: { Open: 96243, JEE_M: 44.2947 }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            // {
+            //     name: "Universal,Vasa",
+            //     branches: {
+            //         COMPUTERS: { CET: { Open: 59135, JEE_M: 33910 }, JEE: { Open: 14257, JEE_M: 36750 } },
+            //         IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: 107424, JEE_M: 52170 } },
+            //         AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: 57.8898, JEE_M: 53.0226 } },
+            //         AIML: { CET: { Open: 39388, JEE_M: 20594 }, JEE: { Open: null, JEE_M: null } },
+            //         EXTC: { CET: { Open: 86.5743, JEE_M: 80.0165 }, JEE: { Open: 61372, JEE_M: 34168 } },
+            //         ECS: { CET: { Open: 78.4501, JEE_M: 68.2213 }, JEE: { Open: null, JEE_M: null } },
+            //         MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: 125344, JEE_M: 64262 } }
+            //     }
+            // },
+            {
+                name: "Theem,Boisar",
+                branches: {
+                    COMPUTERS: { CET: { Open: 82545, JEE_M: 33885 }, JEE: { Open: 107424, JEE_M: 52170 } },
+                    IT: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    EXTC: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Lokmanya Tilak,Kopar Khairane",
+                branches: {
+                    COMPUTERS: { CET: { Open: 29422, JEE_M: 15861 }, JEE: { Open: null, JEE_M: null } },
+                    IT: { CET: { Open: 39388, JEE_M: 20594 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: 61372, JEE_M: 34168 }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 108775, JEE_M: 53643 } },
+                    EXTC: { CET: { Open: 57.2162, JEE_M: 51.7541 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+            {
+                name: "Indira Gandhi,Kopar Khairane",
+                branches: {
+                    COMPUTERS: { CET: { Open: 33592, JEE_M: 23930 }, JEE: { Open: null, JEE_M: null } },
+                    IT: { CET: { Open: 41051, JEE_M: 26095 }, JEE: { Open: null, JEE_M: null } },
+                    AIDS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    AIML: { CET: { Open: null, JEE_M: null }, JEE: { Open: 125344, JEE_M: 64262 } },
+                    EXTC: { CET: { Open: 47.9076, JEE_M: 42.4178 }, JEE: { Open: null, JEE_M: null } },
+                    ECS: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } },
+                    MECH: { CET: { Open: null, JEE_M: null }, JEE: { Open: null, JEE_M: null } }
+                }
+            },
+        ];
+
+        document.getElementById('predictorForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+
+            const studentName = document.getElementById('studentName').value;
+            const examType = document.getElementById('examType').value;
+            const branch = document.getElementById('branch').value;
+            const percentile = parseFloat(document.getElementById('percentile').value);
+            const rank = parseInt(document.getElementById('rank').value);
+
+            // Simulate loading delay
+            setTimeout(() => {
+                const eligibleColleges = findEligibleColleges(examType, branch, percentile, rank);
+                displayResults(studentName, eligibleColleges, examType, branch, percentile, rank);
+                document.getElementById('loading').style.display = 'none';
+            }, 1500);
+        });
+
+        function findEligibleColleges(examType, branch, percentile, rank) {
+            const eligible = [];
+            const rankRange = 5000;
+
+            collegeData.forEach(college => {
+                if (college.branches[branch]) {
+                    const branchData = college.branches[branch][examType];
+
+                    if (branchData) {
+                        // ✅ CET case — show only CET (Open) cutoffs
+                        if (examType === 'CET' && typeof branchData.Open === 'number' && rank <= (branchData.Open + rankRange)) {
+                            eligible.push({
+                                name: college.name,
+                                category: 'CET - Open',
+                                cutoffRank: branchData.Open,
+                                yourRank: rank,
+                                difference: branchData.Open - rank
+                            });
+                        }
+
+                        // ✅ JEE case — show only JEE (JEE_M) cutoffs
+                        if (examType === 'JEE' && typeof branchData.JEE_M === 'number' && rank <= (branchData.JEE_M + rankRange)) {
+                            eligible.push({
+                                name: college.name,
+                                category: 'JEE - General',
+                                cutoffRank: branchData.JEE_M,
+                                yourRank: rank,
+                                difference: branchData.JEE_M - rank
+                            });
+                        }
+                    }
+                }
+            });
+
+            eligible.sort((a, b) => a.cutoffRank - b.cutoffRank);
+            return eligible;
+        }
+
+
+
+        function displayResults(studentName, colleges, examType, branch, percentile, rank) {
+            const resultsDiv = document.getElementById('results');
+
+            if (colleges.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>😔 No Colleges Found</h3>
+                        <p>Sorry <strong>${studentName}</strong>, based on your rank of <strong>${rank}</strong> and percentile of <strong>${percentile}%</strong>, no colleges found for <strong>${branch}</strong> in <strong>${examType}</strong>.</p>
+                        <p>💡 Try improving your rank or consider other branches for better opportunities.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="results-header">
+                    <h3>🎯 College Predictions for ${studentName}</h3>
+                    <div class="student-info">
+                        <div class="info-item">
+                            <div class="info-label">Exam Type</div>
+                            <div class="info-value">${examType}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Branch</div>
+                            <div class="info-value">${branch}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Percentile</div>
+                            <div class="info-value">${percentile}%</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Your Rank</div>
+                            <div class="info-value">${rank}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="college-count">📚 ${colleges.length} Eligible College${colleges.length > 1 ? 's' : ''} Found</div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>🏛️ College Name</th>
+                            <th>📋 Category</th>
+                            <th>🎯 Cutoff Rank</th>
+
+                            <th>✅ Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            colleges.forEach(college => {
+                const status = college.difference >= 0 ? 'Safe' : 'Risky';
+                const statusClass = status === 'Safe' ? 'status-safe' : 'status-risky';
+
+                html += `
+                    <tr>
+                        <td><strong>${college.name}</strong></td>
+                        <td>${college.category}</td>
+                        <td>${college.cutoffRank}</td>
+                       
+                        <td><span class="${statusClass}">${status}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                
+                <div class="note">
+                    <p><strong>📌 Important Notes:</strong></p>
+                    <p>• <span class="status-safe">Safe</span> means your rank is within the cutoff range</p>
+                    <p>• <span class="status-risky">Risky</span> means your rank is slightly higher than cutoff but still considered</p>
+                    <p>• Rankings are based on 2024 cutoffs and may vary in current year</p>
+                    <p>• Always consider multiple options and backup colleges</p>
+                    <p>• Consult with counselors for final admission decisions</p>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+
+</html>
